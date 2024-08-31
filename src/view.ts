@@ -7,7 +7,7 @@ import {
   getWeeklyNoteSettings,
 } from "obsidian-daily-notes-interface";
 import { getMonthlyNote } from "src/io/monthlyNotes"
-import { FileView, TFile, ItemView, WorkspaceLeaf } from "obsidian";
+import { FileView, TFile, ItemView, WorkspaceLeaf, Workspace} from "obsidian";
 import { get } from "svelte/store";
 
 import { TRIGGER_ON_OPEN, VIEW_TYPE_CALENDAR } from "src/constants";
@@ -61,7 +61,7 @@ export default class CalendarView extends ItemView {
     this.registerEvent((this.app.vault as any).on("create", this.onFileCreated));
     this.registerEvent((this.app.vault as any).on("delete", this.onFileDeleted));
     this.registerEvent((this.app.vault as any).on("modify", this.onFileModified));
-    this.registerEvent((this.app.vault as any).on("file-open", this.onFileOpen));
+    this.registerEvent((this.app.workspace as any).on("file-open", this.onFileOpen));
 
     this.settings = null;
     settings.subscribe((val) => {
@@ -227,11 +227,14 @@ export default class CalendarView extends ItemView {
   public onFileOpen(_file: TFile): void {
     if (this.app.workspace.layoutReady) {
       this.updateActiveFile();
+      
     }
   }
 
   private updateActiveFile(): void {
     const { view } = this.app.workspace.activeLeaf as any;
+
+    
 
     let file = null;
     if (view instanceof FileView) {
