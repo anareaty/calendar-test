@@ -12,17 +12,41 @@ import { clamp, getWordCount } from "../utils";
 
 const NUM_MAX_DOTS = 5;
 
+export function clearFileContent(content: string) {
+  return content
+  .replace(/^---\n.*?\n---/ms, "")
+  .replace(/%%.*?%%/gms, "")
+  .replaceAll("—", "")
+  .replaceAll(/[\n]+/mg, " ")
+  .replaceAll(/[ ]+/mg, " ")
+  .replaceAll("==", "")
+  .replaceAll("*", "")
+  .replaceAll("#", "")
+  .replaceAll(/\[\[.*?\]\]/gms, "")
+  .trim()
+}
+
 export async function getWordLengthAsDots(note: TFile): Promise<number> {
   const { wordsPerDot = DEFAULT_WORDS_PER_DOT } = get(settings);
   if (!note || wordsPerDot <= 0) {
     return 0;
   }
-  const fileContents = await window.app.vault.cachedRead(note);
+  let fileContents = await window.app.vault.cachedRead(note);
+  fileContents = clearFileContent(fileContents)
+  
 
   const wordCount = getWordCount(fileContents);
-  const numDots = wordCount / wordsPerDot;
-  return clamp(Math.floor(numDots), 1, NUM_MAX_DOTS);
+
+  if (wordCount != 0) {
+    const numDots = wordCount / wordsPerDot;
+    return clamp(Math.floor(numDots), 1, NUM_MAX_DOTS);
+  } else {
+    return -1
+  }
+
+  
 }
+
 
 export async function getDotsForDailyNote(
   dailyNote: TFile | null
@@ -33,13 +57,23 @@ export async function getDotsForDailyNote(
   const numSolidDots = await getWordLengthAsDots(dailyNote);
 
   const dots = [];
-  for (let i = 0; i < numSolidDots; i++) {
+
+  if (numSolidDots > 0) {
+    for (let i = 0; i < numSolidDots; i++) {
+      dots.push({
+        color: "default",
+        isFilled: true,
+        className: ""
+      });
+    }
+  } else {
     dots.push({
       color: "default",
       isFilled: true,
-      className: ""
+      className: "empty-note-dot"
     });
   }
+  
   return dots;
 }
 
@@ -54,7 +88,7 @@ async function getWordLengthAsDotsMonthly(note: TFile, heading: any, headings: a
 
   const fileContents = await window.app.vault.cachedRead(note);
   let contentArray = fileContents.split("\n")
-  let sectionStartLine = heading.position.start.line
+  let sectionStartLine = heading.position.start.line + 1
   let sectionEndLine = contentArray.length
   let headingIndex = headings.indexOf(heading)
   let nextHeading = headings[headingIndex + 1]
@@ -64,11 +98,15 @@ async function getWordLengthAsDotsMonthly(note: TFile, heading: any, headings: a
   }
 
   contentArray = contentArray.slice(sectionStartLine, sectionEndLine)
-  let sectionContent = contentArray.join("\n")
-
+  let sectionContent = contentArray.join("\n").trim()
   const wordCount = getWordCount(sectionContent);
-  const numDots = wordCount / wordsPerDot;
-  return clamp(Math.floor(numDots), 1, NUM_MAX_DOTS);
+
+  if (wordCount != 0) {
+    const numDots = wordCount / wordsPerDot;
+    return clamp(Math.floor(numDots), 1, NUM_MAX_DOTS);
+  } else {
+    return -1
+  }
 }
 
 
@@ -97,12 +135,20 @@ async function getDotsForMonthlyNote(date: Moment) {
 
   const numSolidDots = await getWordLengthAsDotsMonthly(monthlyNote, heading, headings);
   const dots = [];
-  for (let i = 0; i < numSolidDots; i++) {
+  if (numSolidDots > 0) {
+    for (let i = 0; i < numSolidDots; i++) {
       dots.push({
-          color: "default",
-          isFilled: true,
-          className: ""
+        color: "default",
+        isFilled: true,
+        className: ""
       });
+    }
+  } else {
+    dots.push({
+      color: "default",
+      isFilled: true,
+      className: "empty-note-dot"
+    });
   }
   return dots;
 }
