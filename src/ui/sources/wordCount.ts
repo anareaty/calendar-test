@@ -14,16 +14,10 @@ const NUM_MAX_DOTS = 5;
 
 export function clearFileContent(content: string) {
   return content
-  .replace(/^---\n.*?\n---/ms, "")
-  .replace(/%%.*?%%/gms, "")
-  .replaceAll("—", "")
-  .replaceAll(/[\n]+/mg, " ")
-  .replaceAll(/[ ]+/mg, " ")
-  .replaceAll("==", "")
-  .replaceAll("*", "")
-  .replaceAll("#", "")
-  .replaceAll(/\[\[.*?\]\]/gms, "")
-  .trim()
+    .replace(/^---\n.*?\n---/ms, "").trim()
+    .replace(/^\!\[\[[^\]]*\]\]/, "").trim()
+    .replace(/^#.*$/m, "")
+    .trim()
 }
 
 export async function getWordLengthAsDots(note: TFile): Promise<number> {
@@ -33,7 +27,6 @@ export async function getWordLengthAsDots(note: TFile): Promise<number> {
   }
   let fileContents = await window.app.vault.cachedRead(note);
   fileContents = clearFileContent(fileContents)
-  
 
   const wordCount = getWordCount(fileContents);
 
