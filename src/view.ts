@@ -314,7 +314,7 @@ export default class CalendarView extends ItemView {
           const mode = (this.app.vault as any).getConfig("defaultViewMode");
           const leaf: any = inNewSplit
               ? workspace.splitActiveLeaf()
-              : workspace.getUnpinnedLeaf();
+              : workspace.getLeaf(false);
           let headerString = date.format("#" + this.plugin.options!.monthlyDayFormat)
           let linkText = monthlyNote.path.replace(".md", "") + headerString
 
@@ -337,7 +337,7 @@ export default class CalendarView extends ItemView {
       const mode = (this.app.vault as any).getConfig("defaultViewMode");
       const leaf = inNewSplit
           ? workspace.splitActiveLeaf()
-          : workspace.getUnpinnedLeaf();
+          : workspace.getLeaf(false);
       await leaf.openFile(existingFile, { active : true, eState: mode });
       activeFile.setFile(existingFile);
   } 
