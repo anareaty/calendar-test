@@ -328,7 +328,7 @@ export default class CalendarView extends ItemView {
             inNewSplit,
             this.settings!,
             (dailyNote: TFile) => {
-			  this.app.getLeaf().openFile(dailyNote)
+			  this.app.workspace.getLeaf().openFile(dailyNote)
               //activeFile.setFile(dailyNote);
             }
           );
