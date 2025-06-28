@@ -240,6 +240,7 @@ export default class CalendarView extends ItemView {
     if (view instanceof FileView) {
       file = view.file;
     }
+	
     activeFile.setFile(file!);
 
     if (this.calendar) {
@@ -327,7 +328,8 @@ export default class CalendarView extends ItemView {
             inNewSplit,
             this.settings!,
             (dailyNote: TFile) => {
-              activeFile.setFile(dailyNote);
+			  this.app.getLeaf().openFile(dailyNote)
+              //activeFile.setFile(dailyNote);
             }
           );
           return;
