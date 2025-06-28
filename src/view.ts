@@ -242,6 +242,7 @@ export default class CalendarView extends ItemView {
     }
 	
     activeFile.setFile(file!);
+	this.app.workspace.trigger("layout-change")
 
     if (this.calendar) {
       this.calendar.tick();
@@ -284,6 +285,7 @@ export default class CalendarView extends ItemView {
       // File doesn't exist
       tryToCreateWeeklyNote(startOfWeek, inNewSplit, this.settings!, (file) => {
         activeFile.setFile(file);
+		this.app.workspace.trigger("layout-change")
       });
       return;
     }
@@ -328,8 +330,8 @@ export default class CalendarView extends ItemView {
             inNewSplit,
             this.settings!,
             (dailyNote: TFile) => {
-			  this.app.workspace.getLeaf().openFile(dailyNote)
-              //activeFile.setFile(dailyNote);
+              activeFile.setFile(dailyNote);
+		  	  this.app.workspace.trigger("layout-change")
             }
           );
           return;
@@ -342,6 +344,7 @@ export default class CalendarView extends ItemView {
           : workspace.getLeaf(false);
       await leaf.openFile(existingFile, { active : true, eState: mode });
       activeFile.setFile(existingFile);
+	  this.app.workspace.trigger("layout-change")
   } 
   
 
